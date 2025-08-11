@@ -1,27 +1,21 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using VGameAPI.Database;
 
 namespace VGameAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class VideoGameController : ControllerBase
+    public class VideoGameController(VideoGameDbContext context) : ControllerBase
     {
-        static private List<VideoGame> videoGames = new List<VideoGame>
-                {
-                    new VideoGame { ID = 1, Title = "The Legend of Zelda: Breach of the Wild",
-                        Platform = "Nintendo Switch", Developer = "Nintendo EPD", Publisher = "Nintendo" },
-                    new VideoGame { ID = 2, Title = "God of War", Platform = "PlayStation 4",
-                        Developer = "Santa Monica Studio", Publisher = "Sony Interactive Entertainment" },
-                    new VideoGame { ID = 3, Title = "Minecraft", Platform = "Multi-platform",
-                        Developer = "Mojang Studios", Publisher = "Mojang Studios" }
-                };
+        private readonly VideoGameDbContext _context = context;
 
         [HttpGet]
-        public ActionResult<List<VideoGame>> GetVideoGames()
+        public async Task<ActionResult<List<VideoGame>>> GetVideoGames()
         {
-            return Ok(videoGames);
+            return Ok(await _context.VideoGames.ToListAsync());
         }
         [HttpGet("{id}")]
         public ActionResult<VideoGame> GetVideoGameById(int id)
